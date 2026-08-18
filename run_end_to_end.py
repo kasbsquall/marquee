@@ -15,9 +15,16 @@ from agents.executor import get_executor_agent
 from google import genai
 from google.genai import types
 
+from telemetry.otel_exporter import setup_telemetry
+from telemetry.ai_instrumentation import trace_gemini_call
+
 # Simulación de la ejecución ADK usando llamadas manuales a la API para evitar deadlocks de Windows
 async def run_pipeline():
     load_dotenv()
+    
+    # Inicializar exportadores de OpenTelemetry (para enviar traces a Grafana)
+    tracer, meter, logger = setup_telemetry()
+    
     client = genai.Client()
     
     print("> [1] Simulador omitido (ya ejecutó en background previamente)...")
@@ -30,13 +37,9 @@ async def run_pipeline():
         async with ClientSession(read, write) as session:
             await session.initialize()
             
-            # Helper para ejecutar llamadas a modelo con soporte manual de MCP tools
+            # Helper para ejecutar llamadas a modelo con soporte manual de MCP tools e instrumentación OTel
             async def ask_agent_with_mcp(agent_name, instruction, prompt_text):
                 print(f"\n[Agente: {agent_name}] Analizando...")
-                # Por simplicidad de la demo manual, inyectaremos el contexto crudo si el LLM no puede hacer el tool call directo,
-                # pero intentaremos dejar que el LLM pida las tools.
-                # Como el loop de tools manual es complejo, usaremos las tools que extrajimos antes para inyectar contexto
-                # simulando lo que el runner ADK hace bajo el capó.
                 
                 # Para el Watcher, extraemos las métricas reales
                 if agent_name == "Watcher":
@@ -52,11 +55,17 @@ async def run_pipeline():
                     logs = res.content[0].text if res.content else "No logs"
                     prompt_text += f"\n\n[MCP Context Injected]\nLogs de Loki: {logs}"
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-pro",
-                    contents=prompt_text,
-                    config=types.GenerateContentConfig(system_instruction=instruction)
-                )
+                # Definimos una función interna para poder decorarla dinámicamente con el nombre del agente
+                @trace_gemini_call(agent_name)
+                async def _call_llm(agent, instr, p_text):
+                    return await client.aio.models.generate_content(
+                        model="gemini-2.5-pro",
+                        contents=p_text,
+                        config=types.GenerateContentConfig(system_instruction=instr)
+                    )
+                
+                # Ejecutamos la llamada envuelta en el tracer
+                response = await _call_llm(agent_name, instruction, prompt_text)
                 
                 # Para el Executor, usamos la respuesta para ejecutar la anotación real
                 if agent_name == "Executor":
@@ -95,7 +104,8 @@ async def run_pipeline():
             executor_prompt = f"RECOMENDACIÓN DEL ADVISOR:\n{advisor_out}\n\nDECISIÓN DEL EJECUTIVO:\n{decision}\n\nProcede a anotar la decisión en el sistema usando MCP."
             executor_out = await ask_agent_with_mcp("Executor", executor_agent.instruction, executor_prompt)
 
-    print("\n> Pipeline completado.")
+    print("\n> Pipeline completado. Esperando 5s para exportar trazas OTLP...")
+    await asyncio.sleep(5)
 
 if __name__ == "__main__":
     asyncio.run(run_pipeline())
