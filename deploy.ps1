@@ -17,8 +17,8 @@ foreach ($line in $envLines) {
     # Split by the first '=' to get key and value
     $index = $line.IndexOf('=')
     if ($index -gt 0) {
-        $key = $line.Substring(0, $index).Trim()
-        $value = $line.Substring($index + 1).Trim()
+        $key = $line.Substring(0, $index).TrimStart([char]0xFEFF).Trim()
+        $value = $line.Substring($index + 1).TrimStart([char]0xFEFF).Trim()
         
         Write-Host "Processing secret $key..."
         
