@@ -35,11 +35,21 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-primary);
   min-height: 100vh;
-  background: radial-gradient(circle at 50% -20%, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  /* Cinematic Background Image with Dark Overlay */
+  background: linear-gradient(rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)), url('/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   font-family: var(--font-body);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  animation: bgPan 60s linear infinite alternate;
+}
+
+@keyframes bgPan {
+  from { background-position: 0% center; }
+  to { background-position: 100% center; }
 }
 
 /* Global Typography */
@@ -52,13 +62,14 @@ h1, h2, h3 { font-family: var(--font-display); }
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 2.5rem;
-  background: rgba(2, 6, 23, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(2, 6, 23, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--panel-border);
   position: sticky;
   top: 0;
   z-index: 50;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
 }
 
 .logo-area {
@@ -68,7 +79,8 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 .logo-icon {
-  color: var(--text-pure);
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 8px var(--accent-cyan-glow));
 }
 
 .brand-title {
@@ -81,11 +93,12 @@ h1, h2, h3 { font-family: var(--font-display); }
 .brand-accent {
   color: var(--accent-cyan);
   font-weight: 300;
+  text-shadow: 0 0 10px var(--accent-cyan-glow);
 }
 
 .nav-metrics {
   display: flex;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .nav-metric-item {
@@ -98,14 +111,16 @@ h1, h2, h3 { font-family: var(--font-display); }
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-secondary);
+  color: var(--accent-cyan);
+  opacity: 0.8;
 }
 
 .nav-metric-value {
   font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-pure);
+  transition: all 0.1s ease;
 }
 
 .nav-metric-value.pulse {
@@ -113,8 +128,8 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 @keyframes textPulse {
-  from { text-shadow: 0 0 5px var(--accent-cyan-glow); }
-  to { text-shadow: 0 0 15px var(--accent-cyan); }
+  from { text-shadow: 0 0 5px var(--accent-cyan-glow); color: var(--text-pure); }
+  to { text-shadow: 0 0 15px var(--accent-cyan); color: #e0f2fe; }
 }
 
 /* Bento Grid Layout */
@@ -133,8 +148,8 @@ h1, h2, h3 { font-family: var(--font-display); }
 /* Glass Panels */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   padding: 1.5rem;
@@ -142,7 +157,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.02), 0 20px 40px -10px rgba(0,0,0,0.8);
 }
 
 .glass-panel::before {
@@ -152,7 +167,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.3), transparent);
 }
 
 .panel-header {
@@ -160,6 +175,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  z-index: 2;
 }
 
 .panel-title {
@@ -177,16 +193,16 @@ h1, h2, h3 { font-family: var(--font-display); }
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 1rem;
   border-radius: 9999px;
-  background: rgba(244, 63, 94, 0.1);
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
   color: var(--accent-red);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
   font-family: var(--font-mono);
-  box-shadow: 0 0 10px var(--accent-red-glow);
+  box-shadow: 0 0 15px var(--accent-red-glow);
   position: relative;
 }
 
@@ -196,22 +212,24 @@ h1, h2, h3 { font-family: var(--font-display); }
   top: -2px; left: -2px; right: -2px; bottom: -2px;
   border-radius: 9999px;
   border: 1px solid var(--accent-red);
-  animation: radarPing 2s infinite ease-out;
+  animation: radarPing 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
 @keyframes radarPing {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
 }
 
 /* Analyst Summary (Bento Sub-panel) */
 .analyst-summary {
-  background: rgba(244, 63, 94, 0.03);
+  background: linear-gradient(90deg, rgba(244, 63, 94, 0.05), transparent);
   border: 1px solid rgba(244, 63, 94, 0.15);
-  border-left: 2px solid var(--accent-red);
+  border-left: 3px solid var(--accent-red);
   padding: 1.25rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
 
 .analyst-title {
@@ -222,6 +240,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 0.75rem;
+  text-shadow: 0 0 10px rgba(244,63,94,0.3);
 }
 
 .analyst-text {
@@ -235,11 +254,11 @@ h1, h2, h3 { font-family: var(--font-display); }
   font-weight: 600;
 }
 
-/* Log Stream */
+/* Log Stream with Scanner */
 .log-stream {
   flex: 1;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(34, 211, 238, 0.2);
   border-radius: 8px;
   padding: 1rem;
   font-family: var(--font-mono);
@@ -250,6 +269,29 @@ h1, h2, h3 { font-family: var(--font-display); }
   flex-direction: column;
   gap: 0.5rem;
   position: relative;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* Scanner Animation Line */
+.log-stream::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 20px 5px var(--accent-cyan-glow);
+  opacity: 0.5;
+  animation: scanLine 4s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes scanLine {
+  0% { transform: translateY(-10px); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(500px); opacity: 0; }
 }
 
 .log-entry {

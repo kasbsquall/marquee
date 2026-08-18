@@ -7,6 +7,29 @@ function App() {
   const [selectedPlays, setSelectedPlays] = useState(new Set());
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
+  // Live Data Simulation State
+  const [viewers, setViewers] = useState(14.2);
+  const [bitrate, setBitrate] = useState(4.8);
+
+  // Simulate Live Ticking Data
+  useEffect(() => {
+    const dataInterval = setInterval(() => {
+      // Randomize viewers slightly
+      setViewers(prev => {
+        const jitter = (Math.random() - 0.5) * 0.1;
+        return Number((prev + jitter).toFixed(2));
+      });
+      
+      // Randomize bitrate slightly
+      setBitrate(prev => {
+        const jitter = (Math.random() - 0.5) * 0.2;
+        return Number((prev + jitter).toFixed(2));
+      });
+    }, 1500);
+
+    return () => clearInterval(dataInterval);
+  }, []);
 
   // Simulated Watcher & Analyst Log Stream
   useEffect(() => {
@@ -92,11 +115,11 @@ function App() {
         <div className="nav-metrics">
           <div className="nav-metric-item">
             <span className="nav-metric-label">Global Viewers</span>
-            <span className="nav-metric-value pulse">14.2M</span>
+            <span className="nav-metric-value pulse">{viewers.toFixed(2)}M</span>
           </div>
           <div className="nav-metric-item">
             <span className="nav-metric-label">Ingress Bitrate</span>
-            <span className="nav-metric-value">4.8 Tbps</span>
+            <span className="nav-metric-value">{bitrate.toFixed(2)} Tbps</span>
           </div>
           <div className="nav-metric-item">
             <span className="nav-metric-label">Active Region</span>
