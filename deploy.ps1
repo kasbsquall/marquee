@@ -38,8 +38,8 @@ foreach ($line in $envLines) {
         # Cleanup
         Remove-Item $tempFile
 
-        # Add to mappings for Cloud Run (exclude PORT as Cloud Run injects it)
-        if ($key -ne "PORT") {
+        # Add to mappings for Cloud Run (exclude config vars as they are set via --set-env-vars)
+        if ($key -notin @("PORT", "GOOGLE_GENAI_USE_VERTEXAI", "GOOGLE_CLOUD_PROJECT", "GOOGLE_CLOUD_LOCATION")) {
             $secretMappings += "$($key)=$($key):latest"
         }
     }
