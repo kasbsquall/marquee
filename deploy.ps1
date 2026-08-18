@@ -11,6 +11,8 @@ Write-Host "Creating Secrets in Secret Manager..."
 # Parse .env ignoring comments and empty lines
 $envLines = Get-Content .env | Where-Object { $_ -notmatch '^\s*#' -and $_ -match '=' }
 
+$secretMappings = @()
+
 foreach ($line in $envLines) {
     # Split by the first '=' to get key and value
     $index = $line.IndexOf('=')
@@ -35,8 +37,16 @@ foreach ($line in $envLines) {
         
         # Cleanup
         Remove-Item $tempFile
+
+        # Add to mappings for Cloud Run
+        $secretMappings += "$key=$key:latest"
     }
 }
+
+$secretsFlag = $secretMappings -join ","
+
+Write-Host "Granting Secret Accessor role to default compute service account..."
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:321849204854-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
 
 Write-Host "Deploying Backend to Cloud Run..."
 gcloud run deploy marquee-backend `
@@ -44,7 +54,7 @@ gcloud run deploy marquee-backend `
     --region $REGION `
     --project $PROJECT_ID `
     --allow-unauthenticated `
-    --update-secrets="GEMINI_API_KEY=GEMINI_API_KEY:latest,GRAFANA_URL=GRAFANA_URL:latest,GRAFANA_TOKEN=GRAFANA_TOKEN:latest,OTLP_ENDPOINT=OTLP_ENDPOINT:latest,OTLP_INSTANCE_ID=OTLP_INSTANCE_ID:latest" `
+    --update-secrets=$secretsFlag `
     --quiet
 
 Write-Host "Deploying Frontend to Cloud Run..."
