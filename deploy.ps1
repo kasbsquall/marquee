@@ -38,8 +38,10 @@ foreach ($line in $envLines) {
         # Cleanup
         Remove-Item $tempFile
 
-        # Add to mappings for Cloud Run
-        $secretMappings += "$key=$key:latest"
+        # Add to mappings for Cloud Run (exclude PORT as Cloud Run injects it)
+        if ($key -ne "PORT") {
+            $secretMappings += "$($key)=$($key):latest"
+        }
     }
 }
 
