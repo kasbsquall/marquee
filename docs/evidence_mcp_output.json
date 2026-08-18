@@ -1,0 +1,63 @@
+{
+  "manifest_latency": {
+    "query": "avg_over_time(premiere_manifest_latency_sum{region=\"latam-saopaulo\"}[5m]) / avg_over_time(premiere_manifest_latency_count{region=\"latam-saopaulo\"}[5m])",
+    "result": {
+      "data": [
+        {
+          "metric": {
+            "deployment_environment": "production",
+            "job": "marquee-premiere",
+            "region": "latam-saopaulo",
+            "service_name": "marquee-premiere",
+            "service_version": "1.0.0"
+          },
+          "value": [
+            1787024484.74,
+            "1342.9530117756258"
+          ]
+        }
+      ]
+    }
+  },
+  "startup_failures": {
+    "query": "increase(premiere_startup_failures_total{region=\"latam-saopaulo\"}[5m])",
+    "result": {
+      "data": [
+        {
+          "metric": {
+            "deployment_environment": "production",
+            "job": "marquee-premiere",
+            "region": "latam-saopaulo",
+            "service_name": "marquee-premiere",
+            "service_version": "1.0.0"
+          },
+          "value": [
+            1787024485.194,
+            "8856.666666666668"
+          ]
+        }
+      ]
+    }
+  },
+  "active_viewers": {
+    "query": "premiere_active_viewers{region=\"latam-saopaulo\"}",
+    "result": {
+      "data": [
+        {
+          "metric": {
+            "__name__": "premiere_active_viewers",
+            "deployment_environment": "production",
+            "job": "marquee-premiere",
+            "region": "latam-saopaulo",
+            "service_name": "marquee-premiere",
+            "service_version": "1.0.0"
+          },
+          "value": [
+            1787024485.609,
+            "83570"
+          ]
+        }
+      ]
+    }
+  }
+}
