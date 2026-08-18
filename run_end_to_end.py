@@ -30,7 +30,7 @@ async def run_pipeline():
     print("> [1] Simulador omitido (ya ejecutó en background previamente)...")
     
     env = os.environ.copy()
-    server_params = StdioServerParameters(command="mcp-grafana", args=[], env=env)
+    server_params = StdioServerParameters(command="npx", args=["-y", "@grafana/mcp-grafana"], env=env)
     
     print("\n> Conectando al túnel MCP de Grafana...")
     async with stdio_client(server_params) as (read, write):
