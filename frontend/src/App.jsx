@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, ShieldCheck, Zap, Server, Radio, Power } from 'lucide-react';
+import { Activity, Radio, Server, CheckCircle2, Terminal, Cpu, ShieldAlert } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -8,20 +8,21 @@ function App() {
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Simulación del log stream del Watcher
+  // Simulated Watcher & Analyst Log Stream
   useEffect(() => {
     const initialLogs = [
-      { time: '22:40:01', level: 'info', msg: 'System stable. Market: latam-saopaulo' },
-      { time: '22:40:15', level: 'info', msg: 'Latency 120ms' },
+      { time: '22:40:01', level: 'info', msg: '[System] Baseline stable. Target market: latam-saopaulo' },
+      { time: '22:40:15', level: 'info', msg: '[Network] P99 Latency measuring at 120ms' },
     ];
     
     setLogs(initialLogs);
     
     const incidentSequence = [
-      { delay: 2000, log: { time: '22:40:30', level: 'error', msg: 'ManifestTimeoutError: CDN timeout after 1342ms' } },
-      { delay: 3500, log: { time: '22:40:35', level: 'error', msg: 'ManifestTimeoutError: CDN timeout after 1450ms' } },
-      { delay: 5000, log: { time: '22:40:41', level: 'error', msg: 'High startup failures detected (8,856 total)' } },
-      { delay: 6500, log: { time: '22:40:50', level: 'warning', msg: 'Analyst triggered: Evaluating business impact' } }
+      { delay: 2000, log: { time: '22:40:30', level: 'error', msg: 'ManifestTimeoutError: Primary CDN timeout after 1342ms' } },
+      { delay: 3500, log: { time: '22:40:35', level: 'error', msg: 'ManifestTimeoutError: Primary CDN timeout after 1450ms' } },
+      { delay: 5000, log: { time: '22:40:41', level: 'error', msg: 'CRITICAL: High startup failures detected (8,856 concurrent events)' } },
+      { delay: 6500, log: { time: '22:40:50', level: 'warning', msg: '[Analyst] Triggered: Evaluating business impact...' } },
+      { delay: 8000, log: { time: '22:40:52', level: 'info', msg: '[Advisor] Playbook generated. Awaiting Executive Authorization.' } }
     ];
 
     incidentSequence.forEach(({ delay, log }) => {
@@ -43,17 +44,16 @@ function App() {
 
   const handleAuthorize = () => {
     setIsAuthorizing(true);
-    // Simular llamada al Executor
+    // Simulate Executor delay via MCP
     setTimeout(() => {
       setIsAuthorizing(false);
       setShowSuccessModal(true);
       
-      // Añadir log de auditoría
       const d = new Date();
       setLogs(prev => [...prev, { 
         time: `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`, 
         level: 'info', 
-        msg: `Executor Action: Authorized plays [${Array.from(selectedPlays).join(', ')}] applied to Grafana` 
+        msg: `[Executor] Action Complete: Authorized plays [${Array.from(selectedPlays).join(', ')}] committed to Grafana Cloud.` 
       }]);
     }, 1500);
   };
@@ -61,50 +61,68 @@ function App() {
   const plays = [
     {
       id: 1,
-      title: "Conmutar a CDN de Respaldo",
-      icon: <Server size={20} color="#00f0ff" />,
-      cost: "Alto ($$)",
-      risk: "Medio",
+      title: "Initiate CDN Failover",
+      description: "Immediately route all traffic from primary Edge nodes to the backup CDN provider in the latam region.",
+      icon: <Server size={20} color="#22d3ee" />,
+      cost: "High ($$)",
+      risk: "Medium",
       time: "~2 min",
       riskLevel: "medium"
     },
     {
       id: 2,
-      title: "Modo 'Crisis de Audiencia'",
-      icon: <Radio size={20} color="#ff3366" />,
-      cost: "Muy Alto (PR)",
-      risk: "Bajo",
-      time: "Inmediato",
+      title: "Audience Crisis Mode",
+      description: "Deploy emergency push notifications and in-app banners explaining the delay to prevent subscriber churn.",
+      icon: <Radio size={20} color="#f43f5e" />,
+      cost: "Very High (PR)",
+      risk: "Low",
+      time: "Immediate",
       riskLevel: "low"
     }
   ];
 
   return (
-    <div className="dashboard-container">
-      <header>
+    <>
+      {/* Top Navigation */}
+      <nav className="top-nav">
         <div className="logo-area">
-          <Activity size={32} className="logo-icon" />
-          <h1>Marquee</h1>
+          <Activity size={24} className="logo-icon" />
+          <span className="brand-title">Marquee <span className="brand-accent">Global Premiere Control</span></span>
         </div>
-        <div className="status-badge">
-          <AlertTriangle size={16} />
-          CRITICAL: latam-saopaulo
+        <div className="nav-metrics">
+          <div className="nav-metric-item">
+            <span className="nav-metric-label">Global Viewers</span>
+            <span className="nav-metric-value pulse">14.2M</span>
+          </div>
+          <div className="nav-metric-item">
+            <span className="nav-metric-label">Ingress Bitrate</span>
+            <span className="nav-metric-value">4.8 Tbps</span>
+          </div>
+          <div className="nav-metric-item">
+            <span className="nav-metric-label">Active Region</span>
+            <span className="nav-metric-value" style={{color: '#94a3b8'}}>LATAM</span>
+          </div>
         </div>
-      </header>
+      </nav>
 
-      <div className="main-grid">
-        {/* Columna Izquierda: Telemetría y Análisis */}
+      {/* Main Bento Grid */}
+      <main className="dashboard-container">
+        
+        {/* Left Column: Telemetry */}
         <div className="glass-panel">
-          <div className="panel-header warning">
-            <Activity size={24} />
-            Watcher & Analyst Stream
+          <div className="panel-header">
+            <h2 className="panel-title"><Terminal size={20} /> Live Telemetry & Analyst Stream</h2>
+            <div className="status-badge">
+              <ShieldAlert size={14} />
+              CRITICAL: latam-saopaulo
+            </div>
           </div>
           
           <div className="analyst-summary">
-            <div className="analyst-title">Diagnóstico de Negocio</div>
+            <div className="analyst-title">Business Impact Assessment</div>
             <div className="analyst-text">
-              <strong>IMPACTO:</strong> Caída en mercado #2 (São Paulo), arriesgando $40,000/min.<br/>
-              <strong>CAUSA:</strong> Logs confirman ManifestTimeoutError continuo de la CDN primaria.
+              <span className="analyst-highlight">IMPACT:</span> Severe degradation in Market #2 (São Paulo), risking $40,000/min.<br/>
+              <span className="analyst-highlight">ROOT CAUSE:</span> Logs confirm continuous ManifestTimeoutError from primary CDN.
             </div>
           </div>
 
@@ -121,91 +139,87 @@ function App() {
           </div>
         </div>
 
-        {/* Columna Derecha: Advisor y Ejecución */}
+        {/* Right Column: Playbook */}
         <div className="glass-panel">
-          <div className="panel-header">
-            <Zap size={24} color="#00f0ff" />
-            Advisor Playbook
+          <div className="panel-header" style={{ marginBottom: '1rem' }}>
+            <h2 className="panel-title"><Cpu size={20} color="#22d3ee" /> Executive Action Playbook</h2>
           </div>
           
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-            Selecciona las jugadas de mitigación a autorizar para el Executor.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+            Advisor Agent has generated the following mitigation plays based on the current incident signature. Select the plays you wish to authorize for immediate execution.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+          <div className="plays-grid">
             {plays.map(play => (
               <div 
                 key={play.id} 
                 className={`play-card ${selectedPlays.has(play.id) ? 'selected' : ''}`}
                 onClick={() => togglePlay(play.id)}
               >
-                <div className="play-title">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    {play.icon}
-                    {play.title}
+                <div className="play-header">
+                  <div className="play-title-group">
+                    <div className="play-icon-wrap">{play.icon}</div>
+                    <div>
+                      <div className="play-title">{play.title}</div>
+                      <div className="play-description">{play.description}</div>
+                    </div>
                   </div>
-                  {selectedPlays.has(play.id) && <ShieldCheck size={20} color="#00f0ff" />}
+                  {selectedPlays.has(play.id) && <CheckCircle2 size={24} color="#22d3ee" />}
                 </div>
                 
-                <div className="play-meta">
-                  <div className="meta-item">
-                    <span className="meta-label">Costo</span>
-                    <span className="meta-value">{play.cost}</span>
+                <div className="play-metrics">
+                  <div className="p-metric">
+                    <span className="p-metric-label">Cost</span>
+                    <span className="p-metric-val">{play.cost}</span>
                   </div>
-                  <div className="meta-item">
-                    <span className="meta-label">Riesgo</span>
-                    <span className={`meta-value ${play.risk === 'Alto' ? 'high-risk' : play.risk === 'Bajo' ? 'low-risk' : ''}`}>
+                  <div className="p-metric">
+                    <span className="p-metric-label">Risk</span>
+                    <span className={`p-metric-val ${play.riskLevel === 'medium' ? 'val-med' : 'val-low'}`}>
                       {play.risk}
                     </span>
                   </div>
-                  <div className="meta-item">
-                    <span className="meta-label">Tiempo</span>
-                    <span className="meta-value">{play.time}</span>
+                  <div className="p-metric">
+                    <span className="p-metric-label">ETA</span>
+                    <span className="p-metric-val mono">{play.time}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="action-bar">
+          <div className="action-footer">
+            <div className="selection-info">
+              Selected Plays: <span>{selectedPlays.size}</span>
+            </div>
             <button 
               className="btn-authorize" 
               disabled={selectedPlays.size === 0 || isAuthorizing}
               onClick={handleAuthorize}
             >
-              <Power size={20} />
-              {isAuthorizing ? 'Ejecutando...' : 'AUTORIZAR EJECUCIÓN'}
+              {isAuthorizing ? 'EXECUTING...' : 'AUTHORIZE EXECUTION'}
             </button>
           </div>
         </div>
-      </div>
+      </main>
 
+      {/* Success Modal */}
       {showSuccessModal && (
         <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <ShieldCheck className="modal-icon" />
-            <h2 style={{ color: '#fff', marginBottom: '1rem', fontFamily: 'Outfit' }}>Acción Ejecutada</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              El Executor ha registrado la decisión en Grafana vía MCP y ha actualizado el dashboard del incidente.
+          <div className="modal-card" onClick={e => e.stopPropagation()}>
+            <div className="modal-icon-wrap">
+              <CheckCircle2 size={32} color="#10b981" />
+            </div>
+            <h2 className="modal-title">Execution Authorized</h2>
+            <p className="modal-desc">
+              The Executor Agent has securely registered your decision in Grafana via MCP and updated the active incident dashboard. Mitigations are now in progress.
             </p>
-            <button 
-              style={{
-                marginTop: '1.5rem',
-                padding: '0.75rem 2rem',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#fff',
-                borderRadius: '8px',
-                cursor: 'pointer'
-              }}
-              onClick={() => setShowSuccessModal(false)}
-            >
-              Cerrar
+            <button className="btn-ghost" onClick={() => setShowSuccessModal(false)}>
+              Close Terminal
             </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
