@@ -57,6 +57,7 @@ gcloud run deploy marquee-backend `
     --project $PROJECT_ID `
     --allow-unauthenticated `
     --update-secrets=$secretsFlag `
+    --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=$REGION" `
     --quiet
 
 Write-Host "Deploying Frontend to Cloud Run..."
